@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+	<name>
+		<lang name="default">NiceURL</lang>
+	</name>
+	<author>
+		<lang name="default">LiveStreet Developers Team</lang>
+	</author>
+	<homepage>http://livestreetcms.com</homepage>
+	<version>1.0</version>
+	<requires>
+		<livestreet>0.4.2</livestreet>
+		<plugins>
+
+		</plugins>
+	</requires>
+	<description>
+		<lang name="default">Nice URL for topic</lang>
+		<lang name="russian">Красивые урлы для топиков</lang>
+	</description>
+</plugin>
