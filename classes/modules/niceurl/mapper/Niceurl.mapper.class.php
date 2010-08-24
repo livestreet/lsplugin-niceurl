@@ -63,5 +63,23 @@ class PluginNiceurl_ModuleNiceurl_MapperNiceurl extends Mapper {
 		}		
 		return $aTopics;
 	}
+	
+	
+	public function GetTopicsHeadAll() {				
+		$sql = "SELECT 
+					t.*,
+					tc.*							 
+				FROM 
+					".Config::Get('db.table.topic')." as t	
+					JOIN  ".Config::Get('db.table.topic_content')." AS tc ON t.topic_id=tc.topic_id				
+				";
+		$aTopics=array();
+		if ($aRows=$this->oDb->select($sql)) {
+			foreach ($aRows as $aTopic) {
+				$aTopics[]=Engine::GetEntity('Topic',$aTopic);
+			}
+		}		
+		return $aTopics;
+	}
 }
 ?>

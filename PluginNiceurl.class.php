@@ -40,6 +40,30 @@ class PluginNiceurl extends Plugin {
 			 */
 			$this->ExportSQL(dirname(__FILE__).'/dump.sql');
 		}
+		set_time_limit(0);
+		/**
+		 * Жесткий костыль по загрузке конфига ДО активации плагина
+		 */
+		require_once(Config::Get('path.root.server').'/plugins/niceurl/include/function.php');
+		$aConfig = include(Config::Get('path.root.server').'/plugins/niceurl/config/config.php');
+		if(!empty($aConfig) && is_array($aConfig)) {			
+			$sKey = "plugin.niceurl";
+			if(!Config::isExist($sKey)) {
+				Config::Set($sKey,$aConfig);
+			} else {				
+				Config::Set(
+				$sKey,
+				func_array_merge_assoc(Config::Get($sKey), $aConfig)
+				);
+			}
+		}
+		/**
+		 * Пересохраняем все топики
+		 */
+		$aTopics=$this->PluginNiceurl_Niceurl_GetTopicsHeadAll();
+		foreach ($aTopics as $oTopic) {
+			$this->PluginNiceurl_Niceurl_UpdateTopicUrl($oTopic);
+		}		
 		return true;
 	}
 	

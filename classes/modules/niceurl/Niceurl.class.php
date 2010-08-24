@@ -100,5 +100,43 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 		}		
 		return $data;
 	}
+	
+	
+	public function GetTopicsHeadAll() {
+		return $this->oMapper->GetTopicsHeadAll();
+	}
+	
+	public function BuildUrlForTopic($oTopic) {		
+		$sUrlSource=Config::Get('plugin.niceurl.url').Config::Get('plugin.niceurl.url_postfix');
+		
+		$aPreg=array(
+			'%year%' => date("Y",strtotime($oTopic->GetDateAdd())),
+			'%month%' => date("m",strtotime($oTopic->GetDateAdd())),
+			'%day%' => date("d",strtotime($oTopic->GetDateAdd())),
+			'%hour%' => date("H",strtotime($oTopic->GetDateAdd())),
+			'%minute%' => date("i",strtotime($oTopic->GetDateAdd())),
+			'%second%' => date("s",strtotime($oTopic->GetDateAdd())),
+			//'%login%' => $oTopic->GetUser()->getLogin(),
+			//'%blog%' => $oTopic->GetBlog()->getUrl(),
+			'%id%' => $oTopic->GetId(),
+			'%title%' => $oTopic->GetTitleLat(),
+		);
+		
+		$sBlogUrl=$oTopic->GetBlog()->getUrl();
+		if ($oTopic->GetBlog()->getType()=='personal') {
+			$sBlogUrl=Config::Get('plugin.niceurl.url_personal_blog');
+		}
+		$aPreg['%blog%']=$sBlogUrl;
+		
+		if (strpos($sUrlSource,'%login%')!==false) {
+			if (!($oUser=$oTopic->GetUser())) {
+				$oUser=$this->User_GetUserById($oTopic->getUserId());
+			}
+			$aPreg['%login%']=$oUser->getLogin();
+		}
+		
+		$sUrl=strtr($sUrlSource,$aPreg);		
+		return Config::Get('path.root.web').$sUrl;
+	}
 }
 ?>

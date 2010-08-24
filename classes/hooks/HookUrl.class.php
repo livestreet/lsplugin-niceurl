@@ -28,25 +28,196 @@ class PluginNiceurl_HookUrl extends Hook {
 		 * Подхватываем обработку URL вида /title_topic.html
 		 */
     	if (Router::GetAction()=='error') {
-    		$sEvent=Router::GetActionEvent();    		
-    		if (preg_match("@^([\w_\-]+)\.html$@",$sEvent,$aMatch) ) {
+    		$sEvent=Router::GetActionEvent();
+
+    		
+    		$aParamsNew=Router::GetParams();
+    		$aParamsNew = array_pad($aParamsNew, -(count($aParamsNew)+1), $sEvent);    		
+    		$sUrlRequest=implode('/',$aParamsNew);
+    		
+    	
+    		
+    		if (preg_match(Config::Get('plugin.niceurl.url_preg'),$sUrlRequest,$aMatch)) {
+    			
+    			/**
+    			 * Проверяем корректность
+    			 */
+    			
+    			$sUrlEscape=preg_quote(Config::Get('plugin.niceurl.url'));
+
+    			
+    			$bError=true;
+    			$aRule=array();
+    			$aRuleRequire=array();
+    			if (preg_match_all('#%(\w+)%#',$sUrlEscape,$aMatch2)) {    				
+    				foreach ($aMatch2[1] as $k=>$sFind) {
+    					if (in_array($sFind,array('id','title'))) {
+    						if (isset($aMatch[$k+1])) {
+    							$aRuleRequire[$sFind]=$aMatch[$k+1];
+    						}
+    						$bError=false;
+    					}
+    					$aRule[$k+1]=$sFind;    					
+    				}
+    			}
+    			if ($bError) {
+    				return ;
+    			}
+    			
     			/**
     			 * Получаем топик
     			 */
-    			if (is_numeric($aMatch[1])) {
-    				$oTopic=$this->Topic_GetTopicById($aMatch[1]);
-    			} else {
-    				$oTopic=$this->PluginNiceurl_Niceurl_GetTopicByTitleLat($aMatch[1]);
+    			$oTopic=null;
+    			if (isset($aRuleRequire['id'])) {
+    				$oTopic=$this->Topic_GetTopicById($aRuleRequire['id']);
+    			} elseif (isset($aRuleRequire['title'])) {
+    				$oTopic=$this->PluginNiceurl_Niceurl_GetTopicByTitleLat($aRuleRequire['title']);
     			}
-    			if ($oTopic) {    				
-    				if ($oTopic->getBlog()->getType()=='personal') {    					
-    					Router::Action('blog',$oTopic->getId().'.html',array());
-    				} else {
-    					Router::Action('blog',$oTopic->getBlog()->getUrl(),array($oTopic->getId().'.html'));
+    			if (!$oTopic) {
+    				return ;
+    			}
+    			    			
+    			$sUrlForRedirect=Config::Get('plugin.niceurl.url').Config::Get('plugin.niceurl.url_postfix');
+    			$this->bNeedRedirect=false;
+    			foreach ($aMatch as $k=>$v) {
+    				if ($k>0) {
+    					$this->CheckRule($aRule[$k],$v,$oTopic);
+    					$sUrlForRedirect=str_replace('%'.$aRule[$k].'%',$v,$sUrlForRedirect);
     				}
+    			}
+    			
+    			/**
+    			 * Редирект на правльный URL
+    			 */
+    			if ($this->bNeedRedirect) {
+    				Router::Location(Config::Get('path.root.web').$sUrlForRedirect);    				
+    			}
+    			
+    			$sActionRewrite='blog';
+    			if (LS_VERSION=='0.4.2') { // в след версиях этого делать не нужно, т.к. Router::Action() сделает это сам
+    				$aConfigRoute = Config::Get('router');
+    				$sActionRewrite = (isset($aConfigRoute['rewrite'][$sActionRewrite])) ? $aConfigRoute['rewrite'][$sActionRewrite] : $sActionRewrite;
+    			}
+    			if ($oTopic->getBlog()->getType()=='personal') {
+    				Router::Action($sActionRewrite,$oTopic->getId().'.html',array());
+    			} else {
+    				Router::Action($sActionRewrite,$oTopic->getBlog()->getUrl(),array($oTopic->getId().'.html'));
     			}
     		}    		
     	}    	
+    }
+    
+    protected function CheckRule($sRule,&$sValue,$oTopic) {
+    	switch ($sRule) {
+    		case 'year':
+    			if ($sValue==date("Y",strtotime($oTopic->GetDateAdd()))) {
+    				return true;
+    			} else {
+    				$sValue=date("Y",strtotime($oTopic->GetDateAdd()));
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'month':
+    			if ($sValue==date("m",strtotime($oTopic->GetDateAdd()))) {
+    				return true;
+    			} else {
+    				$sValue=date("m",strtotime($oTopic->GetDateAdd()));
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'day':
+    			if ($sValue==date("d",strtotime($oTopic->GetDateAdd()))) {
+    				return true;
+    			} else {
+    				$sValue=date("d",strtotime($oTopic->GetDateAdd()));
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'hour':
+    			if ($sValue==date("H",strtotime($oTopic->GetDateAdd()))) {
+    				return true;
+    			} else {
+    				$sValue=date("H",strtotime($oTopic->GetDateAdd()));
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'minute':
+    			if ($sValue==date("i",strtotime($oTopic->GetDateAdd()))) {
+    				return true;
+    			} else {
+    				$sValue=date("i",strtotime($oTopic->GetDateAdd()));
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'second':
+    			if ($sValue==date("s",strtotime($oTopic->GetDateAdd()))) {
+    				return true;
+    			} else {
+    				$sValue=date("s",strtotime($oTopic->GetDateAdd()));
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'login':
+    			if ($sValue==$oTopic->GetUser()->getLogin()) {
+    				return true;
+    			} else {
+    				$sValue=$oTopic->GetUser()->getLogin();
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'blog':
+    			$sBlogUrl=$oTopic->GetBlog()->getUrl();
+    			if ($oTopic->GetBlog()->getType()=='personal') {
+    				$sBlogUrl=Config::Get('plugin.niceurl.url_personal_blog');    				
+    			}
+    			
+    			if ($sValue==$sBlogUrl) {
+    				return true;
+    			} else {
+    				$sValue=$sBlogUrl;
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'id':
+    			if ($sValue==$oTopic->GetId()) {
+    				return true;
+    			} else {
+    				$sValue=$oTopic->GetId();
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    	
+    		case 'title':    			
+    			if ($sValue==$oTopic->GetTitleLat()) {
+    				return true;
+    			} else {
+    				$sValue=$oTopic->GetTitleLat();
+    				$this->bNeedRedirect=true;
+    				return false;
+    			}
+    			break;
+    			
+    		default:
+    			break;
+    	}
+    	return true;
     }
     
     public function UpdateTopic($aParams) {

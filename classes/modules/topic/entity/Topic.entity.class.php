@@ -16,11 +16,8 @@
 */
 
 class PluginNiceurl_ModuleTopic_EntityTopic extends PluginNiceurl_Inherit_ModuleTopic_EntityTopic {    
-    public function getUrl() {    	
-    	if ($this->getPublishDraft() and $this->GetTitleLat()) {
-    		return Config::Get('path.root.web').'/'.$this->GetTitleLat().'.html';
-    	}
-    	return Config::Get('path.root.web').'/'.$this->getId().'.html';    	
+    public function getUrl() {    
+    	return $this->PluginNiceurl_Niceurl_BuildUrlForTopic($this);
     }
 }
 ?>
