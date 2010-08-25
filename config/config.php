@@ -38,10 +38,35 @@ $config['table']['topic'] = '___db.table.prefix___niceurl_topic';
  */
 $config['url'] = '/%blog%/%year%/%month%/%day%/%title%';
 $config['url_postfix'] = '.html'; // добавка в конец урла, не рекомендуется её убирать, т.к. могут перестать работать стандартные страницы - они будут перехвачены плагином и отданы как 404 ошибка
-$config['url_personal_blog'] = 'blog'; // URL для персонального блога, нельзя задавать пустым
+$config['url_personal_blog'] = '%login%'; // URL для персонального блога, нельзя задавать пустым. Из шаблонов допустимо значение только '%login%'
 
 
 
+/**
+ * Настройка блоков для отображения на странице топиков
+ */
+$aBlocks=array(
+	array(
+		'group' => 'right',
+		'name' => 'stream',
+		'params' => array(),
+		'priority' => 100,
+	),
+	array(
+		'group' => 'right',
+		'name' => 'tags',
+		'params' => array(),
+		'priority' => 50,
+	),
+	array(
+		'group' => 'right',
+		'name' => 'blogs',
+		'params' => array(),
+		'priority' => 1,
+	),
+);
+
+$config['topic_blocks']=$aBlocks;
 
 
 /**

@@ -76,7 +76,7 @@ class PluginNiceurl_HookUrl extends Hook {
     			if (!$oTopic) {
     				return ;
     			}
-    			    			
+    			
     			$sUrlForRedirect=Config::Get('plugin.niceurl.url').Config::Get('plugin.niceurl.url_postfix');
     			$this->bNeedRedirect=false;
     			foreach ($aMatch as $k=>$v) {
@@ -98,6 +98,11 @@ class PluginNiceurl_HookUrl extends Hook {
     				$aConfigRoute = Config::Get('router');
     				$sActionRewrite = (isset($aConfigRoute['rewrite'][$sActionRewrite])) ? $aConfigRoute['rewrite'][$sActionRewrite] : $sActionRewrite;
     			}
+    			/**
+    			 * Прогружаем блоки
+    			 */
+    			$this->AddBlocks();
+    			
     			if ($oTopic->getBlog()->getType()=='personal') {
     				Router::Action($sActionRewrite,$oTopic->getId().'.html',array());
     			} else {
@@ -182,7 +187,11 @@ class PluginNiceurl_HookUrl extends Hook {
     		case 'blog':
     			$sBlogUrl=$oTopic->GetBlog()->getUrl();
     			if ($oTopic->GetBlog()->getType()=='personal') {
-    				$sBlogUrl=Config::Get('plugin.niceurl.url_personal_blog');    				
+    				$sBlogUrl=Config::Get('plugin.niceurl.url_personal_blog');
+    				// проверка на логин
+    				if ($sBlogUrl=='%login%') {
+    					$sBlogUrl=$oTopic->GetUser()->getLogin();
+    				}
     			}
     			
     			if ($sValue==$sBlogUrl) {
@@ -227,6 +236,13 @@ class PluginNiceurl_HookUrl extends Hook {
     public function AddTopic($aParams) {
     	if ($oTopic=$aParams['result']) {
     		$this->PluginNiceurl_Niceurl_UpdateTopicUrl($oTopic);
+    	}    	
+    }
+    
+    protected function AddBlocks() {
+    	$aBlocks=Config::Get('plugin.niceurl.topic_blocks');
+    	foreach ($aBlocks as $aBlock) {
+    		$this->Viewer_AddBlock($aBlock['group'],$aBlock['name'],$aBlock['params'],$aBlock['priority']);
     	}    	
     }
 }

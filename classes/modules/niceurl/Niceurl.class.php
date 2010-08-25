@@ -125,6 +125,7 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 		$sBlogUrl=$oTopic->GetBlog()->getUrl();
 		if ($oTopic->GetBlog()->getType()=='personal') {
 			$sBlogUrl=Config::Get('plugin.niceurl.url_personal_blog');
+			$sUrlSource=str_replace('%blog%',Config::Get('plugin.niceurl.url_personal_blog'),$sUrlSource);
 		}
 		$aPreg['%blog%']=$sBlogUrl;
 		
