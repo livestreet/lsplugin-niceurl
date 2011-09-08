@@ -102,8 +102,8 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 	}
 	
 	
-	public function GetTopicsHeadAll() {
-		return $this->oMapper->GetTopicsHeadAll();
+	public function GetTopicsHeadAll($iCurrPage,$iPerPage) {
+		return $this->oMapper->GetTopicsHeadAll($iCurrPage,$iPerPage);
 	}
 	
 	public function BuildUrlForTopic($oTopic) {		

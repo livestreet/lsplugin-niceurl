@@ -59,11 +59,15 @@ class PluginNiceurl extends Plugin {
 		}
 		/**
 		 * Пересохраняем все топики
+		 * Получаем топики порциями
 		 */
-		$aTopics=$this->PluginNiceurl_Niceurl_GetTopicsHeadAll();
-		foreach ($aTopics as $oTopic) {
-			$this->PluginNiceurl_Niceurl_UpdateTopicUrl($oTopic);
-		}		
+		$iCurrPage=1;
+		while ($aTopics=$this->PluginNiceurl_Niceurl_GetTopicsHeadAll($iCurrPage,20)) {
+			foreach ($aTopics as $oTopic) {
+				$this->PluginNiceurl_Niceurl_UpdateTopicUrl($oTopic);
+			}
+			$iCurrPage++;
+		}
 		return true;
 	}
 	
