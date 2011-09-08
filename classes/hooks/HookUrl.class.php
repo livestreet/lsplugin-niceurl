@@ -241,9 +241,11 @@ class PluginNiceurl_HookUrl extends Hook {
     
     protected function AddBlocks() {
     	$aBlocks=Config::Get('plugin.niceurl.topic_blocks');
-    	foreach ($aBlocks as $aBlock) {
-    		$this->Viewer_AddBlock($aBlock['group'],$aBlock['name'],$aBlock['params'],$aBlock['priority']);
-    	}    	
+    	if ($aBlocks) {
+    		foreach ($aBlocks as $aBlock) {
+    			$this->Viewer_AddBlock($aBlock['group'],$aBlock['name'],$aBlock['params'],$aBlock['priority']);
+    		}
+    	}
     }
 }
 ?>
