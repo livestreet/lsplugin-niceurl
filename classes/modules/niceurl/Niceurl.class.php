@@ -32,11 +32,7 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 	 * @return ModuleTopic_EntityTopic
 	 */
 	public function GetTopicByTitleLat($sTitle) {
-		if (false === ($data = $this->Cache_Get("topic_by_titlelat_{$sTitle}"))) {			
-			$data = $this->oMapper->GetTopicByTitleLat($sTitle);
-			$this->Cache_Set($data, "topic_by_titlelat_{$sTitle}", array('niceurl_topic_update'), 60*60*24*5);
-		}		
-		return $this->Topic_GetTopicById($data);
+		return $this->Topic_GetTopicById($this->oMapper->GetTopicByTitleLat($sTitle));
 	}
 	/**
 	 * Обновление доп. информации о топике
@@ -45,7 +41,7 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 	 * @return unknown
 	 */
 	public function UpdateTopic(PluginNiceurl_ModuleNiceurl_EntityTopic $oNiceurlTopic) {
-		$this->Cache_Clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG,array('niceurl_topic_update'));
+		//$this->Cache_Clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG,array('niceurl_topic_update'));
 		return $this->oMapper->UpdateTopic($oNiceurlTopic);
 	}
 	/**
@@ -55,7 +51,7 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 	 * @return unknown
 	 */
 	public function DeleteTopicById($sId) {
-		$this->Cache_Clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG,array('niceurl_topic_update'));
+		//$this->Cache_Clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG,array('niceurl_topic_update'));
 		return $this->oMapper->DeleteTopicById($sId);
 	}
 	/**
@@ -88,6 +84,10 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 			$aTopicId=array($aTopicId);
 		}
 		$aTopicId=array_unique($aTopicId);	
+		
+		/*
+		 *  Файловый кеш приводил к жутким тормозам, особенно удаление по тегу
+		 * 
 		$aTopics=array();	
 		$s=join(',',$aTopicId);
 		if (false === ($data = $this->Cache_Get("niceurl_topic_id_{$s}"))) {			
@@ -97,8 +97,10 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 			}
 			$this->Cache_Set($aTopics, "niceurl_topic_id_{$s}", array("niceurl_topic_update"), 60*60*24*1);
 			return $aTopics;
-		}		
-		return $data;
+		}	
+		*/
+		
+		return $this->oMapper->GetTopicsByArrayId($aTopicId);
 	}
 	
 	

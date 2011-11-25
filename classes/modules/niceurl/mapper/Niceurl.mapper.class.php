@@ -58,7 +58,7 @@ class PluginNiceurl_ModuleNiceurl_MapperNiceurl extends Mapper {
 		$aTopics=array();
 		if ($aRows=$this->oDb->select($sql,$aArrayId,$aArrayId)) {
 			foreach ($aRows as $aTopic) {
-				$aTopics[]=Engine::GetEntity('PluginNiceurl_Niceurl_Topic',$aTopic);
+				$aTopics[$aTopic['id']]=Engine::GetEntity('PluginNiceurl_Niceurl_Topic',$aTopic);
 			}
 		}		
 		return $aTopics;

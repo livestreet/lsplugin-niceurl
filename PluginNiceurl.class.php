@@ -19,7 +19,7 @@
  * Запрещаем напрямую через браузер обращение к этому файлу.
  */
 if (!class_exists('Plugin')) {
-	die('Hacking attemp!');
+	die('Hacking attempt!');
 }
 
 class PluginNiceurl extends Plugin {
