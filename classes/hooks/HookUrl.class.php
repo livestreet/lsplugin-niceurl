@@ -28,12 +28,13 @@ class PluginNiceurl_HookUrl extends Hook {
 		 * Подхватываем обработку URL вида /title_topic.html
 		 */
     	if (Router::GetAction()=='error') {
-    		$sEvent=Router::GetActionEvent();
+    		$sEvent=$sActionReal=Router::GetActionEvent();
 
     		
-    		$aParamsNew=Router::GetParams();
-    		$aParamsNew = array_pad($aParamsNew, -(count($aParamsNew)+1), $sEvent);    		
-    		$sUrlRequest=implode('/',$aParamsNew);
+    		$aParamsNew=$aParamsReal=Router::GetParams();
+			$sEventReal=array_shift($aParamsReal);
+			$aParamsNew = array_pad($aParamsNew, -(count($aParamsNew)+1), $sEvent);
+			$sUrlRequest=implode('/',$aParamsNew);
     		
     	
     		
@@ -60,7 +61,8 @@ class PluginNiceurl_HookUrl extends Hook {
     					$aRule[$k+1]=$sFind;    					
     				}
     			}
-    			if ($bError) {
+				if ($bError) {
+					Router::Action($sActionReal,$sEventReal,$aParamsReal);
     				return ;
     			}
     			
@@ -74,6 +76,7 @@ class PluginNiceurl_HookUrl extends Hook {
     				$oTopic=$this->PluginNiceurl_Niceurl_GetTopicByTitleLat($aRuleRequire['title']);
     			}
     			if (!$oTopic) {
+					Router::Action($sActionReal,$sEventReal,$aParamsReal);
     				return ;
     			}
     			
