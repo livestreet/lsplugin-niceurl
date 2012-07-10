@@ -39,6 +39,7 @@ $config['table']['topic'] = '___db.table.prefix___niceurl_topic';
 $config['url'] = '/%blog%/%year%/%month%/%day%/%title%';
 $config['url_postfix'] = '.html'; // добавка в конец урла, не рекомендуется её убирать, т.к. могут перестать работать стандартные страницы - они будут перехвачены плагином и отданы как 404 ошибка
 $config['url_personal_blog'] = '%login%'; // URL для персонального блога, нельзя задавать пустым. Из шаблонов допустимо значение только '%login%'
+$config['url_strict'] = false; // Строгое совпадение URL, при false не учитывается окончание URL, которое может не совпадать с правилом
 
 
 /**
@@ -55,7 +56,7 @@ $aRouterUri=Config::Get('router.uri');
 unset($aRouterUri['~^(\d+)\.html~i']);
 
 $aUrlPreg=func_niceurl_url_to_preg($config['url']);
-$config['url_preg']='~^'.$aUrlPreg['search'].preg_quote($config['url_postfix']).'~i';
+$config['url_preg']='~^'.$aUrlPreg['search'].preg_quote($config['url_postfix']).($config['url_strict'] ? '$' : '').'~i';
 $aRouterUri[$config['url_preg']]="error/".$aUrlPreg['replace'].$config['url_postfix'];
 Config::Set('router.uri',$aRouterUri);
 
