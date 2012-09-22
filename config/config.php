@@ -75,8 +75,9 @@ function func_niceurl_url_to_preg($sUrl) {
 		'%title%' => '([\w_\-]+)',
 	);
 	
-	$sUrl=trim($sUrl,'/ ');	
-	$sUrlEscape=$sUrlEscapeReplace=preg_quote($sUrl);
+	$sUrl=trim($sUrl,'/ ');
+	$sUrlEscape=preg_quote($sUrl);
+	$sUrlEscapeReplace=$sUrl;
 	
 	if (preg_match_all('#%\w+%#',$sUrlEscape,$aMatch)) {
 		foreach ($aMatch[0] as $k=>$sFind) {
