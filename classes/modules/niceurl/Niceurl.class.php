@@ -62,9 +62,16 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 	public function UpdateTopicUrl($oTopic) {
 		$oNiceurlTopic=Engine::GetEntity('PluginNiceurl_ModuleNiceurl_EntityTopic');
     	$oNiceurlTopic->setId($oTopic->getId());
-    	    	
+
     	$i=2;
-    	$sTitle=$sTitleSold=func_translit($oTopic->getTitle());    	
+		$sTitleSource=$oTopic->getNiceurlUrl() ? $oTopic->getNiceurlUrl() : $oTopic->getTitle();
+		if (Config::Get('plugin.niceurl.translit_topic_url')) {
+			$sTitleSource=func_translit($sTitleSource);
+		} else {
+			// заменяем пробелы
+			$sTitleSource=strtr($sTitleSource,array(" "=> "-", "."=> "", "/"=> "-"));
+		}
+    	$sTitle=$sTitleSold=$sTitleSource;
     	while (($oNiceurlTopicOld=$this->PluginNiceurl_Niceurl_GetTopicByTitleLat($sTitle)) and $oNiceurlTopicOld->getId()!=$oNiceurlTopic->getId()) {
     		$sTitle=$sTitleSold.'_'.$i;
     		$i++;
@@ -123,7 +130,7 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 			'%id%' => $oTopic->GetId(),
 			'%title%' => $oTopic->GetTitleLat(),
 		);
-		
+
 		$sBlogUrl=$oTopic->GetBlog()->getUrl();
 		if ($oTopic->GetBlog()->getType()=='personal') {
 			$sBlogUrl=Config::Get('plugin.niceurl.url_personal_blog');

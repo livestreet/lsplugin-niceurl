@@ -20,6 +20,9 @@ $config=array();
  */
 $config['table']['topic'] = '___db.table.prefix___niceurl_topic';
 
+$config['manual_topic_url']=true; // Использовать или нет возможность ручного указания URL для топика
+$config['manual_topic_url_only_admin']=true; // Возможность ручного указания URL только для админа
+$config['translit_topic_url']=true; // Транслитерировать URL топика. Внимани! Значение false работает в тестовом режиме и до конца не протестированно.
 /**
  * Настройка URL
  * Допустимы шаблоны:
@@ -56,7 +59,7 @@ $aRouterUri=Config::Get('router.uri');
 unset($aRouterUri['~^(\d+)\.html~i']);
 
 $aUrlPreg=func_niceurl_url_to_preg($config['url']);
-$config['url_preg']='~^'.$aUrlPreg['search'].preg_quote($config['url_postfix']).($config['url_strict'] ? '$' : '').'~i';
+$config['url_preg']='~^'.$aUrlPreg['search'].preg_quote($config['url_postfix']).($config['url_strict'] ? '$' : '').'~ui';
 $aRouterUri[$config['url_preg']]="error/".$aUrlPreg['replace'].$config['url_postfix'];
 Config::Set('router.uri',$aRouterUri);
 
@@ -72,7 +75,7 @@ function func_niceurl_url_to_preg($sUrl) {
 		'%login%' => '([\da-z\_\-]+)',
 		'%blog%' => '([\da-z\_\-]+)',
 		'%id%' => '(\d+)',
-		'%title%' => '([\w_\-]+)',
+		'%title%' => '([\w_\-а-я]+)',
 	);
 	
 	$sUrl=trim($sUrl,'/ ');

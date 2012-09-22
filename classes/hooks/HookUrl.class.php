@@ -21,6 +21,15 @@ class PluginNiceurl_HookUrl extends Hook {
         $this->AddHook('init_action', 'InitAction');
         $this->AddHook('module_topic_updatetopic_before', 'UpdateTopic');
         $this->AddHook('module_topic_addtopic_after', 'AddTopic');
+
+		$this->AddHook('template_form_add_topic_topic_begin', 'AddToForm');
+		$this->AddHook('template_form_add_topic_link_begin', 'AddToForm');
+		$this->AddHook('template_form_add_topic_question_begin', 'AddToForm');
+		$this->AddHook('template_form_add_topic_photoset_begin', 'AddToForm');
+
+		$this->AddHook('topic_add_before','SaveTopic');
+		$this->AddHook('topic_edit_before','SaveTopic');
+		$this->AddHook('topic_edit_show', 'TopicEdit');
     }
 
     public function InitAction() {
@@ -35,9 +44,7 @@ class PluginNiceurl_HookUrl extends Hook {
 			$sEventReal=array_shift($aParamsReal);
 			$aParamsNew = array_pad($aParamsNew, -(count($aParamsNew)+1), $sEvent);
 			$sUrlRequest=implode('/',$aParamsNew);
-    		
-    	
-    		
+
     		if (preg_match(Config::Get('plugin.niceurl.url_preg'),$sUrlRequest,$aMatch)) {
     			
     			/**
@@ -250,5 +257,48 @@ class PluginNiceurl_HookUrl extends Hook {
     		}
     	}
     }
+
+	/**
+	 * Добавляем инпут в форму
+	 */
+	public function AddToForm() {
+		$oUserCurrent=$this->User_GetUserCurrent();
+		if (!$oUserCurrent) {
+			return;
+		}
+		if (Config::Get('plugin.niceurl.manual_topic_url') and ($oUserCurrent->isAdministrator() or !Config::Get('plugin.niceurl.manual_topic_url_only_admin'))) {
+			return $this->Viewer_Fetch(Plugin::GetTemplatePath(__CLASS__).'inject.topic.form.tpl');
+		}
+	}
+
+	/**
+	 * Обработка сохранения топика
+	 */
+	public function SaveTopic($aParams) {
+		if (!Config::Get('plugin.niceurl.manual_topic_url')) {
+			return false;
+		}
+		if (!($oUserCurrent=$this->User_GetUserCurrent())) {
+			return;
+		}
+		if (!$oUserCurrent->isAdministrator() and Config::Get('plugin.niceurl.manual_topic_url_only_admin')) {
+			return;
+		}
+		$oTopic=$aParams['oTopic'];
+		$oTopic->setNiceurlUrl(null);
+		if (getRequest('topic_niceurl_url')) {
+			$oTopic->setNiceurlUrl(strip_tags(getRequest('topic_niceurl_url')));
+		}
+	}
+
+	/**
+	 * Установка значения параметра в форме
+	 */
+	public function TopicEdit($aVars) {
+		$oTopic=$aVars['oTopic'];
+		if (!isset($_REQUEST['submit_topic_publish']) and !isset($_REQUEST['submit_topic_save'])) {
+			$_REQUEST['topic_niceurl_url']=$oTopic->GetTitleLat();
+		}
+	}
 }
 ?>

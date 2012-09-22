@@ -7,7 +7,7 @@
 		<lang name="default">LiveStreet Developers Team</lang>
 	</author>
 	<homepage>http://livestreetcms.com/addons/view/46/</homepage>
-	<version>2.5</version>
+	<version>2.6</version>
 	<requires>
 		<livestreet>1.*</livestreet>
 		<plugins>

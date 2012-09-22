@@ -15,17 +15,12 @@
 ---------------------------------------------------------
 */
 
-class PluginNiceurl_ModuleTopic_EntityTopic extends PluginNiceurl_Inherit_ModuleTopic_EntityTopic {    
-    public function getUrl() {    
-    	return $this->PluginNiceurl_Niceurl_BuildUrlForTopic($this);
-    }
+/**
+ * Русский языковой файл плагина
+ */
+return array(
+	'topic_create_url' => 'URL топика для ЧПУ',
+	'topic_create_url_notice' => 'Если оставить пустым, то URL сгенерируется автоматичски из заголовка',
+);
 
-	public function getNiceurlUrl() {
-		return $this->getExtraValue('niceurl_url');
-	}
-
-	public function setNiceurlUrl($data) {
-		$this->setExtraValue('niceurl_url',$data);
-	}
-}
 ?>
