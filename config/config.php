@@ -44,6 +44,14 @@ $config['url_postfix'] = '.html'; // добавка в конец урла, не
 $config['url_personal_blog'] = '%login%'; // URL для персонального блога, нельзя задавать пустым. Из шаблонов допустимо значение только '%login%'
 $config['url_strict'] = false; // Строгое совпадение URL, при false не учитывается окончание URL, которое может не совпадать с правилом
 
+/**
+ * Настройка списка редиректов старых адресов на новые
+ * По дефолту два редиректа для стандартных урлов топиков в LS
+ */
+$config['redirect']=array(
+	'/blog/%id%.html',
+	'/blog/%blog%/%id%.html',
+);
 
 /**
  * **************************************** НИЖЕ НЕ ТРОГАТЬ! **********************************
@@ -61,6 +69,15 @@ unset($aRouterUri['~^(\d+)\.html~i']);
 $aUrlPreg=func_niceurl_url_to_preg($config['url']);
 $config['url_preg']='~^'.$aUrlPreg['search'].preg_quote($config['url_postfix']).($config['url_strict'] ? '$' : '').'~ui';
 $aRouterUri[$config['url_preg']]="error/".$aUrlPreg['replace'].$config['url_postfix'];
+
+$config['redirect_preg']=array();
+foreach($config['redirect'] as $sUrl) {
+	$aUrlPreg=func_niceurl_url_to_preg($sUrl);
+	$sPreg='~^'.$aUrlPreg['search'].''.'~ui';
+	$config['redirect_preg'][$sPreg]=$sUrl;
+	$aRouterUri[$sPreg]="error/".$aUrlPreg['replace'].'';
+}
+
 Config::Set('router.uri',$aRouterUri);
 
 
@@ -75,7 +92,7 @@ function func_niceurl_url_to_preg($sUrl) {
 		'%login%' => '([\da-z\_\-]+)',
 		'%blog%' => '([\da-z\_\-]+)',
 		'%id%' => '(\d+)',
-		'%title%' => '([\w_\-а-я]+)',
+		'%title%' => '([\w_\-а-яё]+)',
 	);
 	
 	$sUrl=trim($sUrl,'/ ');

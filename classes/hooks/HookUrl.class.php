@@ -118,7 +118,51 @@ class PluginNiceurl_HookUrl extends Hook {
     			} else {
     				Router::Action($sActionRewrite,$oTopic->getBlog()->getUrl(),array($oTopic->getId().'.html'));
     			}
-    		}    		
+    		} else {
+				/**
+				 * Проверяем на редиректы старых адресов
+				 */
+				$aRedirectPreg=Config::Get('plugin.niceurl.redirect_preg');
+				foreach($aRedirectPreg as $sPreg=>$sUrl) {
+					if (preg_match($sPreg,$sUrlRequest,$aMatch)) {
+						/**
+						 * Проверяем корректность
+						 */
+						$sUrlEscape=preg_quote($sUrl);
+
+						$bError=true;
+						$aRule=array();
+						$aRuleRequire=array();
+						if (preg_match_all('#%(\w+)%#',$sUrlEscape,$aMatch2)) {
+							foreach ($aMatch2[1] as $k=>$sFind) {
+								if (in_array($sFind,array('id','title'))) {
+									if (isset($aMatch[$k+1])) {
+										$aRuleRequire[$sFind]=$aMatch[$k+1];
+									}
+									$bError=false;
+								}
+								$aRule[$k+1]=$sFind;
+							}
+						}
+						if ($bError) {
+							continue;
+						}
+						/**
+						 * Получаем топик
+						 */
+						$oTopic=null;
+						if (isset($aRuleRequire['id'])) {
+							$oTopic=$this->Topic_GetTopicById($aRuleRequire['id']);
+						} elseif (isset($aRuleRequire['title'])) {
+							$oTopic=$this->PluginNiceurl_Niceurl_GetTopicByTitleLat($aRuleRequire['title']);
+						}
+						if ($oTopic) {
+							Router::Location($oTopic->getUrl());
+							return ;
+						}
+					}
+				}
+			}
     	}    	
     }
     

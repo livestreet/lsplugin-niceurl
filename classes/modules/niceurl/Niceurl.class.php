@@ -69,7 +69,8 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 			$sTitleSource=func_translit($sTitleSource);
 		} else {
 			// заменяем пробелы
-			$sTitleSource=strtr($sTitleSource,array(" "=> "-", "."=> "", "/"=> "-"));
+			$sTitleSource=preg_replace("#[^а-яё\w]#ui",'-',$sTitleSource);
+			$sTitleSource = preg_replace('/\-+/', '-', $sTitleSource);
 		}
     	$sTitle=$sTitleSold=$sTitleSource;
     	while (($oNiceurlTopicOld=$this->PluginNiceurl_Niceurl_GetTopicByTitleLat($sTitle)) and $oNiceurlTopicOld->getId()!=$oNiceurlTopic->getId()) {
