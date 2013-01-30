@@ -45,4 +45,35 @@ function func_translit($sText,$bLower=true) {
 }
 
 }
+
+if (!function_exists('func_niceurl_url_to_preg')) {
+	function func_niceurl_url_to_preg($sUrl) {
+		$aPreg=array(
+			'%year%' => '(\d{4})',
+			'%month%' => '(\d{2})',
+			'%day%' => '(\d{2})',
+			'%hour%' => '(\d{2})',
+			'%minute%' => '(\d{2})',
+			'%second%' => '(\d{2})',
+			'%login%' => '([\da-z\_\-]+)',
+			'%blog%' => '([\da-z\_\-]+)',
+			'%id%' => '(\d+)',
+			'%title%' => '([\w_\-а-яё]+)',
+		);
+
+		$sUrl=trim($sUrl,'/ ');
+		$sUrlEscape=preg_quote($sUrl);
+		$sUrlEscapeReplace=$sUrl;
+
+		if (preg_match_all('#%\w+%#',$sUrlEscape,$aMatch)) {
+			foreach ($aMatch[0] as $k=>$sFind) {
+				$sReplace='\\'.($k+1);
+				$sUrlEscapeReplace=str_replace($sFind,$sReplace,$sUrlEscapeReplace);
+			}
+		}
+
+		$sUrlEscape=strtr($sUrlEscape,$aPreg);
+		return array('search'=>$sUrlEscape,'replace'=>$sUrlEscapeReplace);
+	}
+}
 ?>
