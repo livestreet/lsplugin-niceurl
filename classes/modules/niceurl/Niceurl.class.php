@@ -132,8 +132,11 @@ class PluginNiceurl_ModuleNiceurl extends Module {
 			'%title%' => $oTopic->GetTitleLat(),
 		);
 
-		$sBlogUrl=$oTopic->GetBlog()->getUrl();
-		if ($oTopic->GetBlog()->getType()=='personal') {
+		if (!($oBlog=$oTopic->GetBlog())) {
+			$oBlog=$this->Blog_GetBlogById($oTopic->getBlogId());
+		}
+		$sBlogUrl=$oBlog->getUrl();
+		if ($oBlog->getType()=='personal') {
 			$sBlogUrl=Config::Get('plugin.niceurl.url_personal_blog');
 			$sUrlSource=str_replace('%blog%',Config::Get('plugin.niceurl.url_personal_blog'),$sUrlSource);
 		}
