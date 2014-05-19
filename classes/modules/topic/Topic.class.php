@@ -25,7 +25,7 @@ class PluginNiceurl_ModuleTopic extends PluginNiceurl_Inherit_ModuleTopic {
 	 *
 	 * @return unknown
 	 */
-	public function GetTopicsAdditionalData($aTopicId,$aAllowData=array('user'=>array(),'blog'=>array('owner'=>array(),'relation_user'),'vote','favourite','comment_new')) {
+	public function GetTopicsAdditionalData($aTopicId,$aAllowData=null) {
 		$aTopics=parent::GetTopicsAdditionalData($aTopicId,$aAllowData);
 				
 		$aNiceurlTopics=$this->PluginNiceurl_Niceurl_GetTopicsByArrayId($aTopicId);		

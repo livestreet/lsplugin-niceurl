@@ -22,6 +22,7 @@ $config['table']['topic'] = '___db.table.prefix___niceurl_topic';
 
 $config['manual_topic_url']=true; // Использовать или нет возможность ручного указания URL для топика
 $config['manual_topic_url_only_admin']=true; // Возможность ручного указания URL только для админа
+$config['manual_topic_url_users']=array(); // Возможность ручного указания URL для указанных пользователей (прописывать нужно список ID пользователей)
 $config['translit_topic_url']=true; // Транслитерировать URL топика. Внимани! Значение false работает в тестовом режиме и до конца не протестированно.
 /**
  * Настройка URL

@@ -310,7 +310,10 @@ class PluginNiceurl_HookUrl extends Hook {
 		if (!$oUserCurrent) {
 			return;
 		}
-		if (Config::Get('plugin.niceurl.manual_topic_url') and ($oUserCurrent->isAdministrator() or !Config::Get('plugin.niceurl.manual_topic_url_only_admin'))) {
+		if (Config::Get('plugin.niceurl.manual_topic_url') and ($oUserCurrent->isAdministrator()
+			or !Config::Get('plugin.niceurl.manual_topic_url_only_admin')
+			or in_array($oUserCurrent->getId(),(array)Config::Get('plugin.niceurl.manual_topic_url_users'))
+		)) {
 			return $this->Viewer_Fetch(Plugin::GetTemplatePath(__CLASS__).'inject.topic.form.tpl');
 		}
 	}
@@ -325,7 +328,7 @@ class PluginNiceurl_HookUrl extends Hook {
 		if (!($oUserCurrent=$this->User_GetUserCurrent())) {
 			return;
 		}
-		if (!$oUserCurrent->isAdministrator() and Config::Get('plugin.niceurl.manual_topic_url_only_admin')) {
+		if (!$oUserCurrent->isAdministrator() and Config::Get('plugin.niceurl.manual_topic_url_only_admin') and !in_array($oUserCurrent->getId(),(array)Config::Get('plugin.niceurl.manual_topic_url_users'))) {
 			return;
 		}
 		$oTopic=$aParams['oTopic'];
